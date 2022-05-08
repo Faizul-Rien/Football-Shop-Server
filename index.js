@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require( 'cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
 const app = express();
@@ -22,8 +22,28 @@ async function run(){
             app.get('/equipment', async(req,res)=>{
             const query = {};
             const cursor = equiptmentCollection.find(query);
-            const services = await cursor.toArray();
-            res.send(services);
+            const equipments = await cursor.toArray();
+            res.send(equipments);
+            });
+
+            app.get('/equipment/:id', async (req, res)=>{
+                const id = req.params.id;
+                const query = {_id: ObjectId(id)};
+                const equipment = await equiptmentCollection.findOne(query);
+                res.send(equipment);
+            })
+
+            app.post('/equipment', async (req, res)=>{
+                const newEquipment = req.body;
+                const result = await equiptmentCollection.insertOne(newEquipment);
+                res.send(result);
+            })
+
+            app.delete('/equipment/:id', async (req,res)=>{
+                const id = req.params.id;
+                const query = {_id: ObjectId(id)};
+                const result = await equiptmentCollection.deleteOne(query);
+                res.send(result);
             })
         }
 
